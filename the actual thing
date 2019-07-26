@@ -1,0 +1,215 @@
+import java.util.Scanner;
+import java.util.Random;
+import java.util.Arrays;
+public class FinalProject {
+	public static void main(String[] args) {
+		Scanner in = new Scanner(System.in); //user input is necessary for new data point that will be placed, separate method necessary to determine which group?
+		Random r = new Random();
+		double centroid1[][] = new double[22][2]; //array for centroid 1
+		double centroid2[][] = new double[22][2]; //array for centroid 2
+		double centroid3[][] = new double[22][2]; //array for centroid 3
+		double centroid4[][] = new double[22][2]; //array for centroid 4
+		
+		int[][] dataPoints = { //creates array with 18 different data points and 1 user input, NOTE: (x1, y1) = (value, weight)
+			{6088, 2339},
+			{3958, 984},
+			{10775, 578},
+			{1009, 945},
+			{45843, 29930},
+			{32327, 3843},
+			{21633, 8125},
+			{31586, 3511},
+			{17544, 4948},
+			{7496, 1229},
+			{79825, 28264},
+			{122011, 244551},
+			{77575, 25007},
+			{143554, 23944},
+			{4907, 164},
+			{80237, 37940},
+			{3532, 60},
+			{18499, 4397},
+			{0, 0} //reserved for user input, index 24 (dataPoints.length - 1)
+		};
+		
+		System.out.print("Please enter the value of the commodity in USD: ");
+		int value = in.nextInt();
+		
+		System.out.print("Please enter the weight of the commodity in kg: ");
+		int weight = in.nextInt();
+		
+		System.out.println();
+		
+		dataPoints[18][0] = value;
+		dataPoints[18][1] = weight;
+		
+		double[][] centroid = new double[4][2]; //creates array with 4 centroids
+		for(int i = 0; i < 4; i++) { //assigns random centroid value to indices
+			centroid[i][0] = r.nextInt(10);
+			centroid[i][1] = r.nextInt(10);
+		}
+		
+		boolean endLoop = true;
+		while(endLoop) { //goal of while loop: repeat for loop below until distance doesn't change
+			int counter1 = 0;
+			int counter2 = 0;
+			int counter3 = 0;
+			int counter4 = 0;
+			for(int i = 0; i < dataPoints.length; i++) { //goal of for loop: calculate distance and assing data point to centroid
+				double min = Double.POSITIVE_INFINITY; //keeps track of minimum distance
+				int minIdx = -1; //keeps track of which centroid to assign the data point to
+				for(int j = 0; j < 4; j++) { //checks distance to each (4) centroid
+					double distance = distance(dataPoints[i][0], dataPoints[i][1], centroid[j][0], centroid[j][1]);
+					if(distance < min) {
+						min = distance;
+						minIdx = j;
+					}
+				}
+				if(minIdx == 0) { //adds data point to array centroid1
+					centroid1[counter1][0] = dataPoints[i][0];
+					centroid1[counter1][1] = dataPoints[i][1];
+					counter1++;
+				} else if(minIdx == 1) { //adds data point to array centroid2
+					centroid2[counter2][0] = dataPoints[i][0];
+					centroid2[counter2][1] = dataPoints[i][1];
+					counter2++;
+				} else if(minIdx == 2) { //adds data point to array centroid3
+					centroid3[counter3][0] = dataPoints[i][0];
+					centroid3[counter3][1] = dataPoints[i][1];
+					counter3++;
+				} else if(minIdx == 3) { //adds data point to array centroid4
+					centroid4[counter4][0] = dataPoints[i][0];
+					centroid4[counter4][1] = dataPoints[i][1];
+					counter4++;
+				}
+			}
+			double a1 = calculateMeanx(centroid1); //finds mean x of centroid1
+			double a2 = calculateMeany(centroid1); //finds mean y of centroid1
+			boolean a3 = meanTest(centroid[0][0], a1); //tests if meanx is the same
+			boolean a4 = meanTest(centroid[0][1], a2); //tests if meany is the same
+			centroid[0][0] = a1;
+			centroid[0][1] = a2;
+			
+			double b1 = calculateMeanx(centroid2); //finds mean x of centroid1
+			double b2 = calculateMeany(centroid2); //finds mean y of centroid1
+			boolean b3 = meanTest(centroid[1][0], b1); //tests if meanx is the same
+			boolean b4 = meanTest(centroid[1][1], b2); //tests if meany is the same
+			centroid[1][0] = b1;
+			centroid[1][1] = b2;
+			
+			double c1 = calculateMeanx(centroid3); //finds mean x of centroid1
+			double c2 = calculateMeany(centroid3); //finds mean y of centroid1
+			boolean c3 = meanTest(centroid[2][0], c1); //tests if meanx is the same
+			boolean c4 = meanTest(centroid[2][1], c2); //tests if meany is the same
+			centroid[2][0] = c1;
+			centroid[2][1] = c2;
+
+			double d1 = calculateMeanx(centroid4); //finds mean x of centroid1
+			double d2 = calculateMeany(centroid4); //finds mean y of centroid1
+			boolean d3 = meanTest(centroid[3][0], d1); //tests if meanx is the same
+			boolean d4 = meanTest(centroid[3][1], d2); //tests if meany is the same
+			centroid[3][0] = d1;
+			centroid[3][1] = d2;
+			
+			if(!a3 && !a4 && !b3 && !b4 && !c3 && !c4 && !d3 && !d4) { //ends while loop if centroid isn't going to move a lot
+				endLoop = false;
+			}
+		}
+		
+		System.out.println("Centroid 1:");
+		loop1:
+		for (int i = 0; i < centroid1.length; i++) {
+			for (int j = 0; j < centroid1[i].length; j++) {
+				if(centroid1[i][j] != 0) {
+					System.out.print(centroid1[i][j] + ", ");
+				} else {
+					break loop1;
+				}
+			}
+			if(centroid1[i].length != 0) {
+				System.out.println();
+			}
+		}
+		
+		System.out.println();
+		
+		System.out.println("Centroid 2:");
+		loop2:
+		for (int i = 0; i < centroid2.length; i++) {
+			for (int j = 0; j < centroid2[i].length; j++) {
+				if(centroid2[i][j] != 0) {
+					System.out.print(centroid2[i][j] + ", ");
+				} else {
+					break loop2;
+				}
+			}
+			if(centroid2[i].length != 0) {
+				System.out.println();
+			}
+		}
+		
+		System.out.println();
+		
+		System.out.println("Centroid 3:");
+		loop3:
+		for (int i = 0; i < centroid3.length; i++) {
+			for (int j = 0; j < centroid3[i].length; j++) {
+				if(centroid3[i][j] != 0) {
+					System.out.print(centroid3[i][j] + ", ");
+				} else {
+					break loop3;
+				}
+			}
+			if(centroid3[i].length != 0) {
+				System.out.println();
+			}
+		}
+		
+		System.out.println();
+		
+		System.out.println("Centroid 4:");
+		loop4:
+		for (int i = 0; i < centroid4.length; i++) {
+			for (int j = 0; j < centroid4[i].length; j++) {
+				if(centroid4[i][j] != 0) {
+					System.out.print(centroid4[i][j] + ", ");
+				} else {
+					break loop4;
+				}
+			}
+			if(centroid4[i].length != 0) {
+				System.out.println();
+			}
+		}
+		
+		System.out.println();
+	}
+	
+	public static double distance(double x1, double y1, double x2, double y2) { //determines the distance from centroid (x1, y1) to data point (x2, y2)
+		double centroidDistance = (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2);
+		centroidDistance = Math.sqrt(centroidDistance);
+		return centroidDistance; //returns distance
+	}
+	
+	public static double calculateMeanx(double[][] array) { //calculates centroid meanx
+		double meanx = 0;
+		for(int i = 0; i < array.length; i++) { //calculates sum
+			meanx += array[i][0];
+		}
+		meanx /= array.length; //calculates mean
+		return meanx;
+	}
+	
+	public static double calculateMeany(double[][] array) { //calculates centroid meany
+		double meany = 0;
+		for(int i = 0; i < array.length; i++) { //calculates sum
+			meany += array[i][1];
+		}
+		meany /= array.length; //calculates mean
+		return meany;
+	}
+	
+	public static boolean meanTest(double meanPrevious, double mean) { //tests if centroid should move or not	
+		return Math.abs(meanPrevious - mean) > .001;
+	}
+}
